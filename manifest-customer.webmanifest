@@ -1,0 +1,17 @@
+{
+  "name": "ErrandGo Customer",
+  "short_name": "ErrandGo",
+  "start_url": "/ErrandGo/",
+  "scope": "/ErrandGo/",
+  "display": "standalone",
+  "theme_color": "#142636",
+  "background_color": "#f6f8f5",
+  "icons": [
+    {
+      "src": "assets/customer-icon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
