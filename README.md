@@ -34,3 +34,13 @@ Mobile-first errands marketplace with Customer, Rider and Super Admin workspaces
 - Online location requires foreground/browser location permission and updates opportunistically; browser background tracking is not guaranteed. Stale GPS (over 10 minutes) blocks accepting new jobs.
 - Login still requires the WhatsApp OTP provider; no fake OTP or unapproved rider access has been introduced.
 - The responsive separate HTML portals are web app beta entries, **not native Android/iOS apps** yet.
+
+## Separate public entry points (latest update)
+- Customer: `https://finsightmanagement.github.io/ErrandGo/` — phone login/registration only; no rider or admin navigation.
+- Rider: `https://finsightmanagement.github.io/ErrandGo/rider.html` — Rider Login or Apply as a Rider.
+- Rider direct application: `https://finsightmanagement.github.io/ErrandGo/rider.html?apply=1` — shows application form before requesting verification.
+- Admin: `https://finsightmanagement.github.io/ErrandGo/admin.html` — protected operations login, not advertised publicly.
+
+The rider form collects legal name, national ID number, WhatsApp number, driving licence and insurance. No operating-area field. The form asks for WhatsApp verification only after applicants have entered their details; sensitive files are uploaded only after successful authentication. If the provider isn't enabled, the form is visible but final submission cannot complete; provider setup is not optional for this security model.
+
+No real WhatsApp provider is configured or verified. Real application acknowledgement notifications, manager invitation OTPs and automatic new-job alerts are outstanding. Source committed and JS syntax tested, but live browser acceptance and OTP delivery tests remain pending.
