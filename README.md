@@ -44,3 +44,9 @@ Independent GitHub + Supabase app, separate from FinSight. Existing repository r
 - Pre-existing unconfirmed registration attempts may need owner-controlled manual confirmation through Authentication > Users. Do not delete or automatically confirm unknown accounts.
 - For actual demo access, use the Auth dashboard to create or confirm distinct customer, rider and single Super Admin login users. Grant rider and Super Admin roles only from trusted server administration (`auth.users.raw_app_meta_data`), never from public signup metadata. Seed test records exclusively with clearly labeled demo data and never pretend payment succeeded.
 - New frontend validation blocks accidental reuse of the identical uploaded ID/licence/insurance file and provides a clearer account-setup error.
+
+## Browser icons and demo rider (Nov 23)
+- Three distinct generated PNG favicon images are installed: `assets/customer-icon.png`, `assets/rider-icon.png`, `assets/admin-icon.png`. Each respective portal has its own favicon, Apple touch icon reference and web manifest. These are 64px icons optimized for browser tabs and beta shortcuts, not full production mobile-app icon packs.
+- The single Super Admin can go to **All riders** and click **Create Demo Rider Account**. This calls the protected `create-demo-rider` Edge Function with the current Admin JWT. It creates at most one clearly flagged test rider with a randomly generated temporary password, shown exactly once. No emailed OTP/confirmation is needed.
+- Demo riders are explicitly barred from accepting real customer jobs in the `accept_errand` RPC. There is no payment or wallet activation.
+- Current demo account login **does not exist until Admin clicks Create**. Do not invent or print a password in advance.
