@@ -25,3 +25,12 @@ Mobile-first errands marketplace with Customer, Rider and Super Admin workspaces
 - Sensitive rider documents stay in private Supabase Storage, **not in this public GitHub repository**.
 - The browser only contains the publishable Supabase key, not a service-role key.
 - This remains an early beta. Perform security and operational testing before accepting real customers or sensitive applications.
+
+## Rider GPS and multi-job update (22 November 2026)
+- Rider application no longer asks for an operating area. Application starts from the Rider login page.
+- Rider dashboard has Online/Offline GPS sharing, Available jobs, Suggested jobs, My active jobs, and History.
+- Online riders can accept up to **three** active jobs (accepted or picked up). Assignment is still atomic, so only one rider receives each individual errand.
+- Nearby pickup suggestions use the rider's most recently shared browser location and optional customer-supplied pickup GPS, within an initial 8 km straight-line radius. Text-only addresses are shown without a proximity claim; route optimization and capacity checks are **not yet implemented**.
+- Online location requires foreground/browser location permission and updates opportunistically; browser background tracking is not guaranteed. Stale GPS (over 10 minutes) blocks accepting new jobs.
+- Login still requires the WhatsApp OTP provider; no fake OTP or unapproved rider access has been introduced.
+- The responsive separate HTML portals are web app beta entries, **not native Android/iOS apps** yet.
