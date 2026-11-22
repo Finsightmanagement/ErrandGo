@@ -1,46 +1,38 @@
-# ErrandGo
+# ErrandGo · November 2026 Working Build
 
-Mobile-first errands marketplace with Customer, Rider and Super Admin workspaces in one app. Built separately from FinSight.
+Independent GitHub + Supabase app, separate from FinSight. Existing repository retained; obsolete frontend logic in `main.js` was replaced rather than overlaid.
 
-## Current status
-- Frontend: `index.html`, `main.js`, `config.js` (committed to this repository)
-- Supabase project: `qxugzgyadhufoohnprmx` (active)
-- Database: `profiles`, `rider_applications`, `errands`, with RLS
-- Storage: private `rider-documents` bucket
-- Rider review Edge Function: `review-rider` deployed
-- GitHub Pages: requires enabling under **Settings → Pages → Deploy from a branch → main → /(root)**
+## Entry points
+- Customer: https://finsightmanagement.github.io/ErrandGo/
+- Rider: https://finsightmanagement.github.io/ErrandGo/rider.html
+- Rider application: https://finsightmanagement.github.io/ErrandGo/rider.html?apply=1
+- Admin: https://finsightmanagement.github.io/ErrandGo/admin.html
 
-## Important setup before actual user testing
-1. In Supabase **Authentication → Providers**, configure supported phone authentication with WhatsApp delivery via an approved provider; no real OTPs can be delivered until set up.
-2. In Supabase Auth URL settings, configure the GitHub Pages origin and redirect URLs.
-3. Register a **verified** initial Super Admin identity, then set their `app_metadata.role` to `super_admin` through a trusted admin process. Never put privileged credentials in browser code.
-4. Sign out and back in after any rider role change so JWT claims refresh.
-5. In GitHub **Settings → Pages**, select **Deploy from a branch**, **main**, **/(root)** and save. The intended URL is `https://finsightmanagement.github.io/ErrandGo/`.
-6. Test rider application, document upload, Super Admin review and the customer booking/rider acceptance workflow with separate accounts.
+## Implemented source/backend
+- Email/password signup and login in place of WhatsApp OTP. No WhatsApp verification requested. **Supabase email confirmation must be disabled manually** if no-verification signup is desired; this setting is not yet confirmed. Accounts have not been end-to-end tested.
+- Customer: profile with contact number, create/track bookings, chats and previous chats.
+- Rider: application form for name, unique ID and licence numbers, ID front/back, licence, insurance, WhatsApp contact. No operating area. Duplicate ID/licence/phone rejected by database. Automatic document OCR/identity matching is **not** implemented; documents are designated `pending_manual_review` and Admin must inspect them.
+- Super Admin only: rider application review, signed document access, approved riders list, bookings, conversations/receipts, read-only financial ledgers. The single Super Admin identity has **not yet been provisioned**. Admin contact requested: 0723011984.
+- Rider GPS online/offline, nearby available/suggested jobs, limit 3 active jobs, atomic acceptance.
+- Private errand chat with messages, receipts, images, safety acknowledgement for shopping; attached to errand and archived in completed errands. Phone call action opens dialer using assigned counterpart's number.
+- Booking collection and payment records, commission/earnings allocation after backend-verified paid+completed errand, withdrawals request structure and audit history in Supabase.
+- **Payment processing not active**: no provider credentials, no live M-PESA collection/payout, no manual fake-paid button. New bookings remain `unpaid`; riders cannot accept them until a trusted payment integration confirms payment and fee/commission are set.
+- Commission rate and pricing are not configured. No fabricated rates were activated.
+- Customer shopping payment goes to the merchant, never to the rider. Photos, merchant payment details and receipts can be logged in errand chat. Shopping safety pop-up included.
 
-## Scope boundaries
-- WhatsApp outbound application notifications and approval alerts are **not yet implemented**; this code only supports OTP requests after provider configuration.
-- Rider GPS proximity, pricing, deposits, M-PESA payments, rider background push notifications, manager invitations and automatic WhatsApp approvals are **not yet implemented**.
-- No simulated OTP values or hardcoded shared rider PINs.
-- Sensitive rider documents stay in private Supabase Storage, **not in this public GitHub repository**.
-- The browser only contains the publishable Supabase key, not a service-role key.
-- This remains an early beta. Perform security and operational testing before accepting real customers or sensitive applications.
+## Required external activation before genuine end-to-end usage
+1. Configure Supabase email/password Auth with email confirmation disabled (or deliberately use email confirmation as an alternative). Create first Super Admin account and securely set role in `auth.users.raw_app_meta_data`, after verifying ownership.
+2. Connect an authorized Kenya collection/disbursement provider to payment webhooks and settlement. Do not expose provider secrets in browser.
+3. Configure service pricing, commission percentage, refund rules, provider reconciliation and authenticated payout destination verification.
+4. Test on deployed GitHub Pages with real customer/rider accounts, uploads, rider reviews, chat, payments, and GPS.
+5. Add automated ID/licence comparison with a vetted provider, if desired, while preserving manual Admin review.
 
-## Rider GPS and multi-job update (22 November 2026)
-- Rider application no longer asks for an operating area. Application starts from the Rider login page.
-- Rider dashboard has Online/Offline GPS sharing, Available jobs, Suggested jobs, My active jobs, and History.
-- Online riders can accept up to **three** active jobs (accepted or picked up). Assignment is still atomic, so only one rider receives each individual errand.
-- Nearby pickup suggestions use the rider's most recently shared browser location and optional customer-supplied pickup GPS, within an initial 8 km straight-line radius. Text-only addresses are shown without a proximity claim; route optimization and capacity checks are **not yet implemented**.
-- Online location requires foreground/browser location permission and updates opportunistically; browser background tracking is not guaranteed. Stale GPS (over 10 minutes) blocks accepting new jobs.
-- Login still requires the WhatsApp OTP provider; no fake OTP or unapproved rider access has been introduced.
-- The responsive separate HTML portals are web app beta entries, **not native Android/iOS apps** yet.
+## Deferred roadmap
+- **ErrandGo Wallet**: later customer stored value and merchant/shop partnerships, subject to regulatory/compliance review. Not implemented, no wallet balances or customer deposits enabled.
+- Native Android/iOS packaging, push messaging, full GPS route optimization and payments production rollout.
 
-## Separate public entry points (latest update)
-- Customer: `https://finsightmanagement.github.io/ErrandGo/` — phone login/registration only; no rider or admin navigation.
-- Rider: `https://finsightmanagement.github.io/ErrandGo/rider.html` — Rider Login or Apply as a Rider.
-- Rider direct application: `https://finsightmanagement.github.io/ErrandGo/rider.html?apply=1` — shows application form before requesting verification.
-- Admin: `https://finsightmanagement.github.io/ErrandGo/admin.html` — protected operations login, not advertised publicly.
-
-The rider form collects legal name, national ID number, WhatsApp number, driving licence and insurance. No operating-area field. The form asks for WhatsApp verification only after applicants have entered their details; sensitive files are uploaded only after successful authentication. If the provider isn't enabled, the form is visible but final submission cannot complete; provider setup is not optional for this security model.
-
-No real WhatsApp provider is configured or verified. Real application acknowledgement notifications, manager invitation OTPs and automatic new-job alerts are outstanding. Source committed and JS syntax tested, but live browser acceptance and OTP delivery tests remain pending.
+## Security notes
+- RLS enabled on all new public tables and private storage buckets.
+- Financial records and payout statuses are not client-writable.
+- Sensitive rider IDs and licences are available only to applicant and Super Admin.
+- Supabase security advisor can warn about intentionally callable definer RPCs with internal authorization; audit before production.
