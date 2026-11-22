@@ -35,7 +35,7 @@ if(!r.data.session){msg('Account created. Email confirmation is still required b
 user=r.data.user;profile=await ensureProfile(user,{full_name:f.elements.namedItem('full_name').value.trim(),phone:n,whatsapp:n});role=user.app_metadata?.role||'customer';return app();
 }
 await safe(sb.auth.signInWithPassword({email:eMail,password:pw}));return restore()
-}catch(x){msg(x)}finally{b.disabled=false}};
+}catch(x){const m=String(x?.message||x);if(/email rate limit exceeded|over_email_send_rate_limit/i.test(m))msg('Registration is temporarily unavailable. ErrandGo needs its email confirmation setting updated. Please contact support.');else if(/email not confirmed/i.test(m))msg('This account exists but is awaiting email confirmation. Contact ErrandGo support.');else msg(x)}finally{b.disabled=false}};
 }
 async function ensureProfile(u,fields={}){
 let r=await safe(sb.from('profiles').select('*').eq('id',u.id).maybeSingle());if(r.data)return r.data;
@@ -58,6 +58,7 @@ try{
 let n=phone(f.elements.namedItem('mobile').value);if(!n)throw Error('Enter a valid Kenyan phone number.');
 const files=['front','back','licence','insurance'].map(k=>f.elements.namedItem(k).files[0]);
 if(files.some(x=>!x||x.size>5242880||!['image/jpeg','image/png','application/pdf'].includes(x.type)))throw Error('Use a PDF/JPG/PNG smaller than 5 MB for every document.');
+const signatures=files.map(x=>x.name+'|'+x.size+'|'+x.lastModified);if(new Set(signatures).size!==files.length)throw Error('Please upload separate ID front, ID back, driving licence and insurance files. The same document was selected more than once.');
 const email=f.elements.namedItem('email').value.trim().toLowerCase(),password=f.elements.namedItem('password').value;if(password.length<8)throw Error('Password must have at least 8 characters.');
 let u=(await sb.auth.getUser()).data.user;
 if(!u){const r=await safe(sb.auth.signUp({email,password,options:{data:{display_name:f.elements.namedItem('name').value.trim()}}}));if(!r.data.session)throw Error('Account created but Supabase is still requesting email confirmation. Disable confirmation in Auth settings before using no-verification registration.');u=r.data.user}
@@ -70,7 +71,7 @@ const front=await upload(files[0],'id-front'),back=await upload(files[1],'id-bac
 await safe(sb.from('rider_applications').insert({applicant_id:u.id,full_name:f.elements.namedItem('name').value.trim(),national_id:f.elements.namedItem('nationalId').value.trim(),licence_number:f.elements.namedItem('licenceNumber').value.trim(),phone:n,id_front_path:front,id_back_path:back,licence_path:licence,insurance_path:insurance}));
 }catch(x){await sb.storage.from('rider-documents').remove(uploaded);if(/duplicate key/.test(x.message||''))throw Error('Rider already exists with this ID or licence number.');throw x}
 user=u;role='customer';profile=await ensureProfile(u);page='Application';app();msg('Application received. Target review: 48 hours; Admin may approve earlier.')
-}catch(x){msg(x)}finally{b.disabled=false}};
+}catch(x){const m=String(x?.message||x);if(/email rate limit exceeded|over_email_send_rate_limit/i.test(m))msg('New applications are temporarily blocked by an email sending limit. ErrandGo must update its Supabase registration settings.');else if(/email confirmation|confirm email/i.test(m))msg('Account created but registration requires email confirmation. ErrandGo must disable this requirement before applying.');else msg(x)}finally{b.disabled=false}};
 }
 function nav(){
 if(portal==='admin')return ['Overview','Rider applications','All riders','All errands','Chats & receipts','Payments & payouts','Account'];
