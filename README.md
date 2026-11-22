@@ -36,3 +36,11 @@ Independent GitHub + Supabase app, separate from FinSight. Existing repository r
 - Financial records and payout statuses are not client-writable.
 - Sensitive rider IDs and licences are available only to applicant and Super Admin.
 - Supabase security advisor can warn about intentionally callable definer RPCs with internal authorization; audit before production.
+
+## Demo login activation and confirmation-email limit
+- As of 23 Nov 2026, Supabase Auth still has email confirmation enabled on the hosted project. Supabase built-in SMTP currently limits confirmation sending to 2 emails/hour per project, causing the observed `email rate limit exceeded` registration error.
+- The connected Supabase actions do not expose Auth provider configuration or supported Auth admin account creation. A direct demo-account provisioning attempt was blocked; **no demo credentials have been created or verified**.
+- Project owner must open https://supabase.com/dashboard/project/qxugzgyadhufoohnprmx/auth/providers, select Email, disable Confirm email, and Save, if the intentionally unverified signup policy is retained for beta.
+- Pre-existing unconfirmed registration attempts may need owner-controlled manual confirmation through Authentication > Users. Do not delete or automatically confirm unknown accounts.
+- For actual demo access, use the Auth dashboard to create or confirm distinct customer, rider and single Super Admin login users. Grant rider and Super Admin roles only from trusted server administration (`auth.users.raw_app_meta_data`), never from public signup metadata. Seed test records exclusively with clearly labeled demo data and never pretend payment succeeded.
+- New frontend validation blocks accidental reuse of the identical uploaded ID/licence/insurance file and provides a clearer account-setup error.
