@@ -1,0 +1,17 @@
+{
+  "name": "ErrandGo Rider",
+  "short_name": "ErrandGo Rider",
+  "start_url": "/ErrandGo/rider.html",
+  "scope": "/ErrandGo/",
+  "display": "standalone",
+  "theme_color": "#142636",
+  "background_color": "#f6f8f5",
+  "icons": [
+    {
+      "src": "assets/rider-icon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
