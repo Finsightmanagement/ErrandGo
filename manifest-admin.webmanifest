@@ -1,0 +1,17 @@
+{
+  "name": "ErrandGo Admin",
+  "short_name": "ErrandGo Admin",
+  "start_url": "/ErrandGo/admin.html",
+  "scope": "/ErrandGo/",
+  "display": "standalone",
+  "theme_color": "#142636",
+  "background_color": "#f6f8f5",
+  "icons": [
+    {
+      "src": "assets/admin-icon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
